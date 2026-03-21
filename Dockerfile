@@ -15,7 +15,6 @@ RUN apt-get update && apt-get install -y gcc libpq-dev && rm -rf /var/lib/apt/li
 # Note: Ensure you have run 'pip freeze > requirements.txt' on your local machine first!
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install gunicorn psycopg2-binary
 
 # Copy the rest of your Django project into the container
 COPY . /app/

@@ -1,11 +1,8 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15-alpine
     restart: always
     environment:
-      # These match the DATABASES setting in your settings.py
       POSTGRES_DB: fyp_identity_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: dt1026
@@ -17,13 +14,30 @@ services:
   backend:
     build: .
     restart: always
+    env_file:
+      - .env
     command: gunicorn identity_service.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - .:/app
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     depends_on:
       - db
 
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
+  caddy_data:
+  caddy_config:

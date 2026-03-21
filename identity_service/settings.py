@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,12 +26,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+eav7d7ax!uuw7$0o8ugugdqm*ae#8zyz)1@v#g3emgm@g-$dg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '143.198.220.144',
+    '143.198.220.144.nip.io',
 ]
 
 
@@ -86,10 +89,10 @@ WSGI_APPLICATION = 'identity_service.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'fyp_identity_db',
-        'USER': 'postgres',
-        'PASSWORD': 'dt1026',
-        'HOST': 'localhost',
+        'NAME': os.environ.get('DB_NAME', 'fyp_identity_db'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'dt1026'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
         'PORT': '5432',
     }
 }
@@ -157,5 +160,10 @@ SIMPLE_JWT = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    'http://143.198.220.144',
+    "https://fyp-identity-management.vercel.app",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://143.198.220.144.nip.io",
+    "https://fyp-identity-management.vercel.app",
 ]
