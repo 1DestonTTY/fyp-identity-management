@@ -2,7 +2,8 @@ import axios from "axios";
 
 const api = axios.create({
     // baseURL: "http://127.0.0.1:8000/api",
-    baseURL: 'http://143.198.220.144:8000/api/'
+    // baseURL: 'http://143.198.220.144:8000/api/'
+    baseURL: 'https://143.198.220.144.nip.io/api/'
 });
 
 api.interceptors.request.use(
