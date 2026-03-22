@@ -16,6 +16,9 @@ RUN apt-get update && apt-get install -y gcc libpq-dev && rm -rf /var/lib/apt/li
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
+# This gathers all static files into the /app/staticfiles folder inside the container
+RUN python manage.py collectstatic --noinput
+
 # Copy the rest of your Django project into the container
 COPY . /app/
 

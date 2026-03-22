@@ -9,5 +9,13 @@ frontend/node_modules/
 frontend/dist/
 frontend/build/
 
+# Django Static & Media
+staticfiles/
+media/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
 # Secrets (Important!)
 .env
