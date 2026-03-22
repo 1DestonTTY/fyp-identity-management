@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     ApiRootView,
     ProfileListCreateView,
@@ -11,11 +12,14 @@ from .views import (
     ContextPreviewView,
     RegisterView,
     DataExportView,
+    CustomTokenObtainPairView
 )
 
 urlpatterns = [
     path("", ApiRootView.as_view(), name="api-root"),
     path("register/", RegisterView.as_view(), name="register"),
+    path("token/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"), 
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("profiles/", ProfileListCreateView.as_view(), name="profile-list"),
     path("profiles/<int:pk>/", ProfileDetailView.as_view(), name="profile-detail"),
     path("profiles/<int:pk>/context-preview/", ContextPreviewView.as_view(), name="context-preview"),

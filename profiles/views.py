@@ -2,6 +2,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny 
 from .models import Profile, IdentityName, OnlineProfile
 from .serializers import ProfileSerializer, IdentityNameSerializer, OnlineProfileSerializer, ContextProfileSerializer, RegisterSerializer
 from .permissions import IsOwnerOrAdmin
@@ -157,7 +158,6 @@ class OnlineProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
             return OnlineProfile.objects.all()
         return OnlineProfile.objects.filter(profile__user=self.request.user)
 
-
 class MyProfileView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -165,7 +165,7 @@ class MyProfileView(APIView):
         context_type = request.query_params.get("context", None)
 
         try:
-            profile = Profile.objects.get(user=request.user)
+            profile, created = Profile.objects.get_or_create(user=request.user)
         except Profile.DoesNotExist:
             return Response({"detail": "Profile not found."}, status=404)
 
@@ -200,7 +200,6 @@ class ContextPreviewView(APIView):
             }
         )
         return Response(serializer.data)
-    
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -213,3 +212,4 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+    permission_classes = [AllowAny]
