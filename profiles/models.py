@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+#core profile extednding django default user
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True, null=True)
@@ -12,7 +13,7 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
-
+#model to handle multiple names for a single user
 class IdentityName(models.Model):
     NAME_TYPE_CHOICES = [
         ("legal", "Legal"),
@@ -43,7 +44,7 @@ class IdentityName(models.Model):
     def __str__(self):
         return f"{self.full_name} ({self.context})"
 
-
+#model to store links
 class OnlineProfile(models.Model):
     PLATFORM_CHOICES = [
         ("github", "GitHub"),

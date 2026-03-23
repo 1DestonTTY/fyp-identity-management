@@ -2,19 +2,19 @@ from rest_framework import serializers
 from .models import Profile, IdentityName, OnlineProfile
 from django.contrib.auth.models import User
 
-
+#serializer for individial identity name
 class IdentityNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = IdentityName
         fields = '__all__'
 
-
+#serializer for digital/social links
 class OnlineProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = OnlineProfile
         fields = '__all__'
 
-
+#standard profile serializer
 class ProfileSerializer(serializers.ModelSerializer):
     names = IdentityNameSerializer(many=True, read_only=True)
     online_profiles = OnlineProfileSerializer(many=True, read_only=True)
@@ -23,6 +23,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = '__all__'
 
+#complex serializer that adjust based on the context
 class ContextProfileSerializer(serializers.ModelSerializer):
     names = serializers.SerializerMethodField()
     online_profiles = serializers.SerializerMethodField()
@@ -56,7 +57,7 @@ class ContextProfileSerializer(serializers.ModelSerializer):
         is_owner = request and request.user == obj.user
         is_admin = request and request.user.is_staff
 
-        # Visibility rules
+        #visibility rules
         if is_owner:
             pass
         elif is_admin:
@@ -64,7 +65,7 @@ class ContextProfileSerializer(serializers.ModelSerializer):
         else:
             queryset = queryset.filter(visibility="public")
 
-        # Context-based platform filtering
+        #context-based platform filtering
         if context_value == "professional":
             queryset = queryset.filter(platform__in=["linkedin", "github", "website"])
         elif context_value == "social":
@@ -94,6 +95,7 @@ class ContextProfileSerializer(serializers.ModelSerializer):
 
         return data
     
+#serializer handling user registration
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=6)
     confirm_password = serializers.CharField(write_only=True, min_length=6)

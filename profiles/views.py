@@ -11,6 +11,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.utils import timezone
 
+#view to generate full JSON dump
 class DataExportView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -58,6 +59,7 @@ class DataExportView(APIView):
 
         return Response(export_data)
 
+#landing endpoint for the API
 class ApiRootView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -75,6 +77,7 @@ class ApiRootView(APIView):
             }
         })
 
+#handle user signup
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
@@ -84,7 +87,7 @@ class RegisterView(generics.CreateAPIView):
         user = serializer.save()
         Profile.objects.create(user=user)
 
-
+#list all profiles (admin only) or just the user own profile
 class ProfileListCreateView(generics.ListCreateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -94,7 +97,7 @@ class ProfileListCreateView(generics.ListCreateAPIView):
             return Profile.objects.all()
         return Profile.objects.filter(user=self.request.user)
 
-
+#CRUD for specific profile
 class ProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
@@ -104,7 +107,7 @@ class ProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
             return Profile.objects.all()
         return Profile.objects.filter(user=self.request.user)
 
-
+#view for managing identityname
 class IdentityNameListCreateView(generics.ListCreateAPIView):
     serializer_class = IdentityNameSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -122,6 +125,7 @@ class IdentityNameListCreateView(generics.ListCreateAPIView):
 
         serializer.save()
 
+#detail view for a specific identityname
 class IdentityNameDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = IdentityNameSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
@@ -131,7 +135,7 @@ class IdentityNameDetailView(generics.RetrieveUpdateDestroyAPIView):
             return IdentityName.objects.all()
         return IdentityName.objects.filter(profile__user=self.request.user)
 
-
+#view for managing online profiles
 class OnlineProfileListCreateView(generics.ListCreateAPIView):
     serializer_class = OnlineProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -149,6 +153,7 @@ class OnlineProfileListCreateView(generics.ListCreateAPIView):
 
         serializer.save()
 
+#detail view for a specific online profile
 class OnlineProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OnlineProfileSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
@@ -158,6 +163,7 @@ class OnlineProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
             return OnlineProfile.objects.all()
         return OnlineProfile.objects.filter(profile__user=self.request.user)
 
+#a view for the logged in user to trigger filtering
 class MyProfileView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -178,6 +184,7 @@ class MyProfileView(APIView):
         )
         return Response(serializer.data)
     
+#allow admin to preview how specific profile looks in different context
 class ContextPreviewView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -201,6 +208,7 @@ class ContextPreviewView(APIView):
         )
         return Response(serializer.data)
 
+#customize the jwt token
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -209,7 +217,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["is_staff"] = user.is_staff
         return token
 
-
+#view to handle login/token exchange
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
     permission_classes = [AllowAny]

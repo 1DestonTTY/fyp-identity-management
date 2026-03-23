@@ -6,12 +6,12 @@ from .models import Profile, IdentityName, OnlineProfile
 
 class IdentityPrivacyTests(TestCase):
     def setUp(self):
-        # 1. Setup a Test User and Profile
+        #setup a Test User and Profile
         self.user = User.objects.create_user(username="testuser", password="password123")
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
         
-        # Profile is created via signals or manually in your RegisterView
+        #profile is created thrugh signals or manually in your RegisterView
         self.profile = Profile.objects.create(
             user=self.user, 
             bio="Software Engineer", 
@@ -44,16 +44,15 @@ class IdentityPrivacyTests(TestCase):
         )
 
     def test_professional_context_filtering(self):
-        """Verify only professional data is returned in professional context"""
         response = self.client.get("/api/my-profile/?context=professional")
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Should see professional name
+        #should see professional name
         names = [n['full_name'] for n in response.data['names']]
         self.assertIn("Professional User", names)
         self.assertNotIn("Legal Name User", names)
         
-        # Should see LinkedIn but NOT Steam (private/gaming)
+        #should see LinkedIn but NOT Steam (private/gaming)
         platforms = [p['platform'] for p in response.data['online_profiles']]
         self.assertIn("linkedin", platforms)
         self.assertNotIn("other", platforms)
@@ -63,31 +62,30 @@ class IdentityPrivacyTests(TestCase):
         response = self.client.get("/api/my-profile/?context=legal")
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Should see Legal Name
+        #should see legal name
         names = [n['full_name'] for n in response.data['names']]
         self.assertIn("Legal Name User", names)
         
-        # Gender identity should be present in representation for owner/legal
+        #gender identity should present in representation for owner/legal
         self.assertIn("gender_identity", response.data)
         self.assertEqual(response.data["gender_identity"], "Non-binary")
 
     def test_export_returns_only_authenticated_users_data(self):
-        """Verify the GDPR export is locked to the authenticated owner"""
-        # 1. Create another user
+        #create another user
         other_user = User.objects.create_user(username="hacker", password="password123")
         
-        # FIX: Manually create the profile for the hacker user
+        #manually create the profile for the hacker user
         Profile.objects.create(user=other_user) 
         
         self.client.force_authenticate(user=other_user)
         
-        # 2. Request export data
+        #request export data
         response = self.client.get("/api/export-data/")
         
-        # 3. Always check status code first to catch errors before checking keys
+        #always check status code first to catch errors before checking keys
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-        # 4. Verify the hacker gets their OWN username, not the 'testuser' data
+        #verify the hacker gets their OWN username, not the 'testuser' data
         self.assertEqual(response.data['user_metadata']['username'], "hacker")
         self.assertNotEqual(response.data['user_metadata']['username'], "testuser")
 
